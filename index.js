@@ -2,6 +2,8 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 require('dotenv').config()
+const jwt = require('jsonwebtoken');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 
@@ -11,7 +13,6 @@ app.use(express.json())
 
 
 // database connection start
-const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.USER_NAME}:${process.env.USER_PASSWORD}@cluster0.hoynchx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -27,6 +28,24 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+  //jwt token here
+  app.post('/jwt', (req, res) => {
+    const email = req.body;
+    const token = jwt.sign(email, process.env.ACCESS_TOKEN, { expiresIn: '1h' });
+    res.send({token})
+  })
+
+  app.post('/users', async (req, res) => {
+    const user = req.body;
+    console.log(user)
+  })
+
+
+
+
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
