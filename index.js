@@ -3,7 +3,7 @@ const app = express()
 const cors = require('cors')
 require('dotenv').config()
 const jwt = require('jsonwebtoken');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 
@@ -59,7 +59,7 @@ async function run() {
 
 
   //get user data
-  app.get('/users', async (req, res) =>{
+  app.get('/users', verifyJWT, async (req, res) =>{
     const users = await usersCollection.find().toArray();
     res.send(users)
   })
@@ -73,6 +73,14 @@ async function run() {
       return res.send({message: 'user already exists'})
     }
     const result = await usersCollection.insertOne(data)
+    res.send(result)
+  })
+
+  // delete user in admin dashboard
+  app.delete('/users/admin/:id', verifyJWT, async (req, res) => {
+    const id = req.params.id;
+    const query = {_id : new ObjectId(id)}
+    const result = await usersCollection.deleteOne(query);
     res.send(result)
   })
 
