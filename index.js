@@ -29,6 +29,9 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    // database table
+    const usersCollection = client.db("kidsAcademyDB").collection("users");
+
   //jwt token here
   app.post('/jwt', (req, res) => {
     const email = req.body;
@@ -36,14 +39,18 @@ async function run() {
     res.send({token})
   })
 
+
+  // post user data
   app.post('/users', async (req, res) => {
-    const user = req.body;
-    console.log(user)
+    const data = req.body;
+    const query = {email: data?.email}
+    const existingUser = await usersCollection.findOne(query)
+    if(existingUser){
+      return res.send({message: 'user already exists'})
+    }
+    const result = await usersCollection.insertOne(data)
+    res.send(result)
   })
-
-
-
-
 
 
     // Send a ping to confirm a successful connection
