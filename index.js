@@ -11,6 +11,24 @@ const port = process.env.PORT || 5000;
 app.use(cors())
 app.use(express.json())
 
+// verifyJWT token
+const verifyJWT = (req, res, next) => {
+
+  const authorization = req.headers.authorization;
+  if(!authorization){
+    return res.status(401).send({error: true, message: 'invalid authorization'})
+  }
+  
+  const token = authorization.split(' ')[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN, function(err, decoded) {
+    if(err){
+      return res.status(401).send({error: true, message: 'invalid authorization'})
+    }
+    req.decoded = decoded;
+    next();
+  });
+}
+
 
 // database connection start
 const uri = `mongodb+srv://${process.env.USER_NAME}:${process.env.USER_PASSWORD}@cluster0.hoynchx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -38,6 +56,7 @@ async function run() {
     const token = jwt.sign(email, process.env.ACCESS_TOKEN, { expiresIn: '1h' });
     res.send({token})
   })
+
 
 
   // post user data
