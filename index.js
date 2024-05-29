@@ -68,6 +68,17 @@ async function run() {
     next()
   }
 
+  // check admin
+  const checkInstructor = async (req, res, next) => {
+    const email = req.decoded.email;
+    const query = {email: email}
+    const user = await usersCollection.findOne(query)
+    if(user?.role !== 'instructor'){
+      return res.status(401).send({error: true, message: 'unauthorized access token'})
+    }
+    next()
+  }
+
 
   //get user data in admin dashboard (admin get)
   app.get('/users', verifyJWT, checkAdmin, async (req, res) =>{
