@@ -58,10 +58,24 @@ async function run() {
   })
 
 
-  //get user data
+  //get user data in admin dashboard (admin get)
   app.get('/users', verifyJWT, async (req, res) =>{
     const users = await usersCollection.find().toArray();
     res.send(users)
+  })
+
+  // get admin data (admin)
+  app.get('/users/admin/:email', verifyJWT, async (req, res) => {
+    const email = req.params.email;
+
+    if(req.decoded?.email === email){
+      res.send({admin : false})
+    }
+
+    const query = {email: email}
+    const user = await usersCollection.findOne(query)
+    const result = {admin: user?.role === 'admin'}
+    res.send(result)
   })
 
   // post user data
@@ -76,11 +90,55 @@ async function run() {
     res.send(result)
   })
 
-  // delete user in admin dashboard
+  // create users to admin role with patch data (admin patch)
+  app.patch('/users/admin/:id', async (req, res) => {
+    const id = req.params.id;
+    const query = { _id : new ObjectId(id)}
+    const body = req.body;
+    const options = { upsert: true };
+    const updateDoc = {
+      $set: {
+        role: body.role
+      },
+    };
+    const result = await usersCollection.updateOne(query, updateDoc, options);
+    res.send(result)
+  })
+
+  // delete user in admin dashboard (admin delete)
   app.delete('/users/admin/:id', verifyJWT, async (req, res) => {
     const id = req.params.id;
     const query = {_id : new ObjectId(id)}
     const result = await usersCollection.deleteOne(query);
+    res.send(result)
+  })
+
+    // get admin data (admin)
+    app.get('/users/instructor/:email', verifyJWT, async (req, res) => {
+      const email = req.params.email;
+  
+      if(req.decoded?.email === email){
+        res.send({instructor : false})
+      }
+  
+      const query = {email: email}
+      const user = await usersCollection.findOne(query)
+      const result = {instructor: user?.role === 'instructor'}
+      res.send(result)
+    })
+
+  // create users to instructor role with patch data (admin patch)
+  app.patch('/users/instructor/:id', async (req, res) => {
+    const id = req.params.id;
+    const query = { _id : new ObjectId(id)}
+    const body = req.body;
+    const options = { upsert: true };
+    const updateDoc = {
+      $set: {
+        role: body.role
+      },
+    };
+    const result = await usersCollection.updateOne(query, updateDoc, options);
     res.send(result)
   })
 
