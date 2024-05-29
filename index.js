@@ -57,15 +57,39 @@ async function run() {
     res.send({token})
   })
 
+  // check admin
+  const checkAdmin = async (req, res, next) => {
+    const email = req.decoded.email;
+    const query = {email: email}
+    const user = await usersCollection.findOne(query)
+    if(user?.role !== 'admin'){
+      return res.status(401).send({error: true, message: 'unauthorized access token'})
+    }
+    next()
+  }
+
 
   //get user data in admin dashboard (admin get)
-  app.get('/users', verifyJWT, async (req, res) =>{
+  app.get('/users', verifyJWT, checkAdmin, async (req, res) =>{
     const users = await usersCollection.find().toArray();
     res.send(users)
   })
 
+  app.get('/users/admin/:email', verifyJWT, async (req, res) => {
+    const email = req.params.email;
+
+    if(req.decoded?.email !== email){
+      return res.send({admin: false})
+    }
+
+    const query = {email : email};
+    const user = await usersCollection.findOne(query);
+    const result = {admin: user?.role === 'admin'};
+    res.send(result)
+  })
+
   //create admin from user
-  app.patch('/users/admin/:id', async (req, res) => {
+  app.patch('/users/admin/:id',verifyJWT, checkAdmin, async (req, res) => {
     const id = req.params.id;
     const filter = {_id : new ObjectId(id)}
     const updateDoc = {
@@ -75,7 +99,6 @@ async function run() {
     };
     const result = await usersCollection.updateOne(filter, updateDoc);
     res.send(result)
-
   })
 
   // post user data
@@ -92,7 +115,7 @@ async function run() {
 
 
   // delete user in admin dashboard (admin delete)
-  app.delete('/users/admin/:id', verifyJWT, async (req, res) => {
+  app.delete('/users/admin/:id', verifyJWT, checkAdmin, async (req, res) => {
     const id = req.params.id;
     const query = {_id : new ObjectId(id)}
     const result = await usersCollection.deleteOne(query);
