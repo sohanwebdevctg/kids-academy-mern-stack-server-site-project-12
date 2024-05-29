@@ -64,18 +64,18 @@ async function run() {
     res.send(users)
   })
 
-  // get admin data (admin)
-  app.get('/users/admin/:email', verifyJWT, async (req, res) => {
-    const email = req.params.email;
-
-    if(req.decoded?.email === email){
-      res.send({admin : false})
-    }
-
-    const query = {email: email}
-    const user = await usersCollection.findOne(query)
-    const result = {admin: user?.role === 'admin'}
+  //create admin from user
+  app.patch('/users/admin/:id', async (req, res) => {
+    const id = req.params.id;
+    const filter = {_id : new ObjectId(id)}
+    const updateDoc = {
+      $set: {
+        role: 'admin'
+      },
+    };
+    const result = await usersCollection.updateOne(filter, updateDoc);
     res.send(result)
+
   })
 
   // post user data
@@ -90,20 +90,6 @@ async function run() {
     res.send(result)
   })
 
-  // create users to admin role with patch data (admin patch)
-  app.patch('/users/admin/:id', async (req, res) => {
-    const id = req.params.id;
-    const query = { _id : new ObjectId(id)}
-    const body = req.body;
-    const options = { upsert: true };
-    const updateDoc = {
-      $set: {
-        role: body.role
-      },
-    };
-    const result = await usersCollection.updateOne(query, updateDoc, options);
-    res.send(result)
-  })
 
   // delete user in admin dashboard (admin delete)
   app.delete('/users/admin/:id', verifyJWT, async (req, res) => {
@@ -113,34 +99,6 @@ async function run() {
     res.send(result)
   })
 
-    // get admin data (admin)
-    app.get('/users/instructor/:email', verifyJWT, async (req, res) => {
-      const email = req.params.email;
-  
-      if(req.decoded?.email === email){
-        res.send({instructor : false})
-      }
-  
-      const query = {email: email}
-      const user = await usersCollection.findOne(query)
-      const result = {instructor: user?.role === 'instructor'}
-      res.send(result)
-    })
-
-  // create users to instructor role with patch data (admin patch)
-  app.patch('/users/instructor/:id', async (req, res) => {
-    const id = req.params.id;
-    const query = { _id : new ObjectId(id)}
-    const body = req.body;
-    const options = { upsert: true };
-    const updateDoc = {
-      $set: {
-        role: body.role
-      },
-    };
-    const result = await usersCollection.updateOne(query, updateDoc, options);
-    res.send(result)
-  })
 
 
     // Send a ping to confirm a successful connection
