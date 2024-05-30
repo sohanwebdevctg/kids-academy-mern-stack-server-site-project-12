@@ -79,6 +79,8 @@ async function run() {
     next()
   }
 
+  
+
 
   //get user data in admin dashboard (admin get)
   app.get('/users', verifyJWT, checkAdmin, async (req, res) =>{
@@ -130,6 +132,13 @@ async function run() {
     const query = {_id : new ObjectId(id)}
     const result = await usersCollection.deleteOne(query);
     res.send(result)
+  })
+
+  // get instructor
+  app.get('/users/instructor', async (req, res,) => {
+    const role = {role: 'instructor'}
+    const users = await usersCollection.find(role).toArray();
+    res.send(users)
   })
 
   // get instructor user
