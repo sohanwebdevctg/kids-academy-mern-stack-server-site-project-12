@@ -79,9 +79,6 @@ async function run() {
     next()
   }
 
-  
-
-
   //get user data in admin dashboard (admin get)
   app.get('/users', verifyJWT, checkAdmin, async (req, res) =>{
     const users = await usersCollection.find().toArray();
@@ -134,10 +131,9 @@ async function run() {
     res.send(result)
   })
 
-  // get instructor
-  app.get('/users/instructor', async (req, res,) => {
-    const role = {role: 'instructor'}
-    const users = await usersCollection.find(role).toArray();
+  //get instructors form card data
+  app.get('/users/instructors', async (req, res) =>{
+    const users = await usersCollection.find().toArray();
     res.send(users)
   })
 
