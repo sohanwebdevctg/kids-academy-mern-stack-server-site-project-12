@@ -170,18 +170,12 @@ async function run() {
       res.send(allClass);
     })
 
-    // get instructor all classes
+    // get single instructor class information data
     app.get('/allClass/instructor', verifyJWT, checkInstructor, async (req, res) => {
-      let query = {}
-      if(req.query?.email){
-        query = {instructorEmail : req.query?.email}
-      }
-      const decoded = req.decoded.email;
-      if(req.query?.email !== decoded){
-        return res.status(403).send({error: true, message: "Unauthorized access token"})
-      }
-      const allClass = await classesCollection.find(query).toArray();
-      res.send(allClass);
+      const email = req.query?.email;
+      const query = {instructorEmail: email}
+      const result = await classesCollection.find(query).toArray();
+      res.send(result)
     })
 
     // post instructor classes
