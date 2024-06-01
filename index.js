@@ -49,6 +49,7 @@ async function run() {
 
     // database table
     const usersCollection = client.db("kidsAcademyDB").collection("users");
+    const classesCollection = client.db("kidsAcademyDB").collection("classes");
 
   //jwt token here
   app.post('/jwt', (req, res) => {
@@ -160,6 +161,13 @@ async function run() {
         },
       };
       const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result)
+    })
+
+    // post instructor classes
+    app.post('/classes', verifyJWT, async(req, res) => {
+      const data = req.body;
+      const result = await classesCollection.insertOne(data);
       res.send(result)
     })
 
