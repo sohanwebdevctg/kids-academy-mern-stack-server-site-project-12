@@ -165,8 +165,22 @@ async function run() {
     })
 
     // get all classes for admin
-    app.get('/allClass', verifyJWT, checkAdmin, async (req, res) => {
-      const allClass = await usersCollection.find().toArray();
+    app.get('/allClass', async (req, res) => {
+      const allClass = await classesCollection.find().toArray();
+      res.send(allClass);
+    })
+
+    // get instructor all classes
+    app.get('/allClass/instructor', verifyJWT, checkInstructor, async (req, res) => {
+      let query = {}
+      if(req.query?.email){
+        query = {instructorEmail : req.query?.email}
+      }
+      const decoded = req.decoded.email;
+      if(req.query?.email !== decoded){
+        return res.status(403).send({error: true, message: "Unauthorized access token"})
+      }
+      const allClass = await classesCollection.find(query).toArray();
       res.send(allClass);
     })
 
