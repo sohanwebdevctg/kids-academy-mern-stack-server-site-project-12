@@ -164,14 +164,18 @@ async function run() {
       res.send(result)
     })
 
+    // get all classes for admin
+    app.get('/allClass', verifyJWT, checkAdmin, async (req, res) => {
+      const allClass = await usersCollection.find().toArray();
+      res.send(allClass);
+    })
+
     // post instructor classes
-    app.post('/classes', verifyJWT, async(req, res) => {
+    app.post('/classes', verifyJWT, checkInstructor, async(req, res) => {
       const data = req.body;
       const result = await classesCollection.insertOne(data);
       res.send(result)
     })
-
-
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
