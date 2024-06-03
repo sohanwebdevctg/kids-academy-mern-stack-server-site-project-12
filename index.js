@@ -50,6 +50,7 @@ async function run() {
     // database table
     const usersCollection = client.db("kidsAcademyDB").collection("users");
     const classesCollection = client.db("kidsAcademyDB").collection("classes");
+    const selectedClassesCollection = client.db("kidsAcademyDB").collection("selectedClasses");
 
   //jwt token here
   app.post('/jwt', (req, res) => {
@@ -183,6 +184,43 @@ async function run() {
       const data = req.body;
       const result = await classesCollection.insertOne(data);
       res.send(result)
+    })
+
+    // admin change instructor class status
+    app.patch('/classes/status/:id', verifyJWT, checkAdmin, async(req, res) => {
+      const id = req.params.id;
+      const body = req.body
+      const filter = {_id : new ObjectId(id)}
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          status: body.status
+        },
+      };
+      const result = await classesCollection.updateOne(filter, updateDoc, options);
+      res.send(result)
+    })
+
+    //admin give feedback for instructor
+    app.patch('/classes/feedback/:id',verifyJWT, checkAdmin, async(req, res) => {
+      const id = req.params.id;
+      const body = req.body;
+      const filter = {_id : new ObjectId(id)}
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          feedback: body.feedback
+        },
+      };
+      const result = await classesCollection.updateOne(filter, updateDoc, options);
+      res.send(result)
+    })
+
+    //user selected classes data
+    app.post('/selectedClass', verifyJWT, async (req, res) => {
+      const data = req.body;
+      const result = await selectedClassesCollection.insertOne(data);
+      res.send(result);
     })
 
     // Send a ping to confirm a successful connection
