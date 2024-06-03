@@ -219,8 +219,16 @@ async function run() {
     //get selected classes from user
     app.get('/selectedClass', verifyJWT, async (req, res) => {
       const email = req.query.email;
-      const query = {email: email}
+      const query = {email: email};
       const result = await selectedClassesCollection.find(query).toArray();
+      res.send(result);
+    })
+
+    //get single selected classes id
+    app.get('/selectedClass/:id',verifyJWT,async (req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await selectedClassesCollection.findOne(query);
       res.send(result);
     })
 
