@@ -216,6 +216,14 @@ async function run() {
       res.send(result)
     })
 
+    //get selected classes from user
+    app.get('/selectedClass', verifyJWT, async (req, res) => {
+      const email = req.query.email;
+      const query = {email: email}
+      const result = await selectedClassesCollection.find(query).toArray();
+      res.send(result);
+    })
+
     //user selected classes data
     app.post('/selectedClass', verifyJWT, async (req, res) => {
       const data = req.body;
