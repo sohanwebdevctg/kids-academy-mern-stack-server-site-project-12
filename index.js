@@ -249,6 +249,14 @@ async function run() {
       res.send(result);
     })
 
+    //enroll class
+    app.get('/enrollClass',verifyJWT, async (req, res) => {
+      const email = req.query.email;
+      const query = {email: email};
+      const result = await paymentsClassesCollection.find(query).toArray();
+      res.send(result)
+    })
+
 
     // create-payment-intent
     app.post('/create-payment-intent', async (req, res) => {
