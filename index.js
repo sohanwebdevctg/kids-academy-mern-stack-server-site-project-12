@@ -257,6 +257,13 @@ async function run() {
       res.send(result)
     })
 
+    // paymentHistory enroll classes
+    app.get('/paymentHistory', verifyJWT, async (req, res) => {
+      const email = req.query.email;
+      const query = {email: email};
+      const result = await paymentsClassesCollection.find(query).sort({date: -1}).toArray();
+      res.send(result)
+    })
 
     // create-payment-intent
     app.post('/create-payment-intent', async (req, res) => {
@@ -281,6 +288,19 @@ async function run() {
       const query = { _id: new ObjectId(payment.selectedClassId)}
       const selectedClass = await selectedClassesCollection.deleteOne(query)
       delete payment.selectedClassId;
+
+      //totalEnroll & availableSeats
+      const classQuery = {_id : new ObjectId(payment.classId)}
+      const findClass = await classesCollection.findOne(classQuery)
+      const updateAvailableSeats = findClass.availableSeats - 1;
+      const updateDoc = {
+        $set: {
+          availableSeats: updateAvailableSeats,
+          totalEnroll: ++findClass.totalEnroll || 1
+        }
+      }
+
+      const updatedClass = await classesCollection.updateOne(classQuery, updateDoc)
 
       // payment classes
       const result = await paymentsClassesCollection.insertOne(payment);

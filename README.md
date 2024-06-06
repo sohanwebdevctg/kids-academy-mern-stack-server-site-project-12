@@ -4,3 +4,4 @@
 * ### here using Node.js web application framework express.js
 * ### here using user check token this token is a json web token who can check validate user
 * ### here are always checking (admin,instructor, users)
+* ### this project we are using payment methods(stripe)
