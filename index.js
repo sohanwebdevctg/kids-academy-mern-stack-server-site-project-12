@@ -167,6 +167,11 @@ async function run() {
       res.send(result)
     })
 
+    app.get('/popularClass', async (req, res) => {
+      const popularClass = await classesCollection.find({status: 'approved'}).sort({totalEnroll: -1}).toArray();
+      res.send(popularClass)
+    })
+
     // get all classes for admin
     app.get('/allClass', async (req, res) => {
       const allClass = await classesCollection.find().toArray();
