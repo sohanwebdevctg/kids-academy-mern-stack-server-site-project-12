@@ -52,6 +52,7 @@ async function run() {
     const usersCollection = client.db("kidsAcademyDB").collection("users");
     const classesCollection = client.db("kidsAcademyDB").collection("classes");
     const selectedClassesCollection = client.db("kidsAcademyDB").collection("selectedClasses");
+    const paymentsClassesCollection = client.db("kidsAcademyDB").collection("payments");
 
   //jwt token here
   app.post('/jwt', (req, res) => {
@@ -261,6 +262,21 @@ async function run() {
       res.send({
         clientSecret: paymentIntent.client_secret
       });
+    })
+
+    //payment
+    app.post('/payments', async (req, res) => {
+      const payment = req.body;
+      console.log(payment)
+
+      //delete selected class
+      const query = { _id: new ObjectId(payment.selectedClassId)}
+      const selectedClass = await selectedClassesCollection.deleteOne(query)
+      delete payment.selectedClassId;
+
+      // payment classes
+      const result = await paymentsClassesCollection.insertOne(payment);
+      res.send(result)
     })
 
     // Send a ping to confirm a successful connection
