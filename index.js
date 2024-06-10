@@ -167,6 +167,7 @@ async function run() {
       res.send(result)
     })
 
+    //get total enroll approved classes
     app.get('/popularClass', async (req, res) => {
       const popularClass = await classesCollection.find({status: 'approved'}).sort({totalEnroll: -1}).toArray();
       res.send(popularClass)
