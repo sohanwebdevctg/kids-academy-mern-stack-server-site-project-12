@@ -12,6 +12,8 @@ const port = process.env.PORT || 5000;
 app.use(cors())
 app.use(express.json())
 
+
+
 // verifyJWT token
 const verifyJWT = (req, res, next) => {
 
@@ -46,7 +48,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     // database table
     const usersCollection = client.db("kidsAcademyDB").collection("users");
